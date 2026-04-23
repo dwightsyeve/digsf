@@ -19,7 +19,19 @@ import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
 
 function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode, adminOnly?: boolean }) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-brand/20 border-t-brand rounded-full animate-spin" />
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verifying Session...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) return <Navigate to="/signin" replace />;
   if (adminOnly && user?.role !== 'admin' && user?.email !== 'tester419tester@gmail.com') return <Navigate to="/dashboard" replace />;
   return <>{children}</>;

@@ -11,8 +11,14 @@ export default function SignUp() {
   const [lastName, setLastName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp, signInWithGoogle, signInWithFacebook } = useAuth();
+  const { signUp, signInWithGoogle, signInWithFacebook, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

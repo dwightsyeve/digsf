@@ -9,18 +9,8 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, increment, collection, query, where, getDocs, addDoc, serverTimestamp, getDocFromServer, onSnapshot } from 'firebase/firestore';
+// auth, db, googleProvider, facebookProvider imports...
 import { auth, db, googleProvider, facebookProvider } from '../lib/firebase';
-
-// Test connection on boot
-const testConnection = async () => {
-  try {
-    await getDocFromServer(doc(db, 'system', 'connection-test'));
-    console.log("Firestore connection successful");
-  } catch (error: any) {
-    console.warn("Firestore connection check:", error.message);
-  }
-};
-testConnection();
 
 interface User {
   uid: string;
@@ -29,6 +19,7 @@ interface User {
   email: string;
   avatar?: string;
   role: 'user' | 'admin';
+  walletBalance?: number;
 }
 
 interface AuthContextType {
@@ -54,31 +45,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         // Listen for real-time updates to the user document
-        unsubscribeSnapshot = onSnapshot(doc(db, 'users', firebaseUser.uid), (userDoc) => {
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setUser({
-              uid: firebaseUser.uid,
-              email: firebaseUser.email!,
-              firstName: userData.firstName,
-              lastName: userData.lastName,
-              role: (firebaseUser.email === 'tester419tester@gmail.com') ? 'admin' : (userData.role || 'user'),
-              avatar: userData.avatar || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
-              walletBalance: userData.walletBalance || 0, // Ensure we pass the live balance
-            });
-          } else {
-            // Initial sync for social login users without a doc yet
-            setUser({
-              uid: firebaseUser.uid,
-              email: firebaseUser.email!,
-              firstName: firebaseUser.displayName?.split(' ')[0] || 'User',
-              lastName: firebaseUser.displayName?.split(' ')[1] || '',
-              role: 'user',
-              avatar: firebaseUser.photoURL || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
-            });
-          }
+        try {
+          unsubscribeSnapshot = onSnapshot(doc(db, 'users', firebaseUser.uid), (userDoc) => {
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              setUser({
+                uid: firebaseUser.uid,
+                email: firebaseUser.email!,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                role: (firebaseUser.email === 'tester419tester@gmail.com') ? 'admin' : (userData.role || 'user'),
+                avatar: userData.avatar || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
+                walletBalance: userData.walletBalance || 0,
+              } as User);
+            } else {
+              // Initial sync for social login users without a doc yet
+              setUser({
+                uid: firebaseUser.uid,
+                email: firebaseUser.email!,
+                firstName: firebaseUser.displayName?.split(' ')[0] || 'User',
+                lastName: firebaseUser.displayName?.split(' ')[1] || '',
+                role: 'user',
+                avatar: firebaseUser.photoURL || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
+              });
+            }
+            setLoading(false);
+          }, (error) => {
+            console.error("User snapshot error:", error);
+            // Fallback for offline or permission errors so app isn't stuck
+            if (!user) {
+              setUser({
+                uid: firebaseUser.uid,
+                email: firebaseUser.email!,
+                firstName: firebaseUser.displayName?.split(' ')[0] || 'User',
+                lastName: firebaseUser.displayName?.split(' ')[1] || '',
+                role: 'user',
+              } as User);
+            }
+            setLoading(false);
+          });
+        } catch (err) {
+          console.error("onSnapshot setup failed:", err);
           setLoading(false);
-        });
+        }
       } else {
         setUser(null);
         if (unsubscribeSnapshot) unsubscribeSnapshot();
@@ -101,8 +110,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
     
     // Check system settings for sign up bonus
-    const settingsDoc = await getDoc(doc(db, 'system', 'settings'));
-    const settings = settingsDoc.data() || { signupBonusEnabled: true, signupBonusAmount: 2000 };
+    let settings = { signupBonusEnabled: true, signupBonusAmount: 2000 };
+    try {
+      const settingsDoc = await getDoc(doc(db, 'system', 'settings'));
+      if (settingsDoc.exists()) settings = { ...settings, ...settingsDoc.data() };
+    } catch (e) {
+      console.warn("Settings lookup failed during signup", e);
+    }
     
     const initialBalance = settings.signupBonusEnabled ? settings.signupBonusAmount : 0;
 
@@ -162,40 +176,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const syncUser = async (firebaseUser: FirebaseUser) => {
-    const userSnapshot = await getDoc(doc(db, 'users', firebaseUser.uid));
-    if (!userSnapshot.exists()) {
-      const names = firebaseUser.displayName?.split(' ') || ['User', ''];
-      
-      const settingsDoc = await getDoc(doc(db, 'system', 'settings'));
-      const settings = settingsDoc.data() || { signupBonusEnabled: true, signupBonusAmount: 2000, referralBonusAmount: 500 };
-      const initialBalance = settings.signupBonusEnabled ? settings.signupBonusAmount : 0;
-      
-      const referralCode = firebaseUser.uid.substring(0, 6).toUpperCase();
-      const urlParams = new URLSearchParams(window.location.search);
-      const referredBy = urlParams.get('ref');
-
-      const userData = {
-        uid: firebaseUser.uid,
-        email: firebaseUser.email!,
-        firstName: names[0],
-        lastName: names.slice(1).join(' '),
-        avatar: firebaseUser.photoURL || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
-        createdAt: new Date().toISOString(),
-        walletBalance: initialBalance,
-        totalDeposited: 0,
-        totalWithdrawn: 0,
-        role: 'user',
-        referralCode,
-        referredBy: referredBy || null,
-        referralEarnings: 0,
-        bankDetails: {
-          bankName: '',
-          accountName: '',
-          accountNumber: ''
+    try {
+      const userSnapshot = await getDoc(doc(db, 'users', firebaseUser.uid));
+      if (!userSnapshot.exists()) {
+        const names = firebaseUser.displayName?.split(' ') || ['User', ''];
+        
+        let settings = { signupBonusEnabled: true, signupBonusAmount: 2000, referralBonusAmount: 500 };
+        try {
+          const settingsDoc = await getDoc(doc(db, 'system', 'settings'));
+          if (settingsDoc.exists()) settings = { ...settings, ...settingsDoc.data() };
+        } catch (e) {
+          console.warn("Settings lookup failed, using defaults", e);
         }
-      };
 
-      await setDoc(doc(db, 'users', firebaseUser.uid), userData);
+        const initialBalance = settings.signupBonusEnabled ? settings.signupBonusAmount : 0;
+        const referralCode = firebaseUser.uid.substring(0, 6).toUpperCase();
+        const urlParams = new URLSearchParams(window.location.search);
+        const referredBy = urlParams.get('ref');
+
+        const userData = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email!,
+          firstName: names[0],
+          lastName: names.slice(1).join(' '),
+          avatar: firebaseUser.photoURL || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
+          createdAt: new Date().toISOString(),
+          walletBalance: initialBalance,
+          totalDeposited: 0,
+          totalWithdrawn: 0,
+          role: 'user',
+          referralCode,
+          referredBy: referredBy || null,
+          referralEarnings: 0,
+          bankDetails: {
+            bankName: '',
+            accountName: '',
+            accountNumber: ''
+          }
+        };
+
+        await setDoc(doc(db, 'users', firebaseUser.uid), userData);
+      }
+    } catch (err) {
+      console.error("syncUser failed:", err);
     }
   };
 
