@@ -1,4 +1,4 @@
-# Security Specification - DigiSafe
+# Security Specification - PrimeInvest
 
 ## 1. Data Invariants
 - **Users**: Users can only manage their own profile. Admin can manage all.

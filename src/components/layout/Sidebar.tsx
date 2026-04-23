@@ -113,7 +113,7 @@ export default function Sidebar() {
                    </div>
                    <div className="pt-2 border-t border-white/10">
                       <p className="text-[10px] font-black text-white/50 uppercase tracking-widest leading-none mb-1">Account Name</p>
-                      <p className="text-[11px] font-black uppercase text-brand">DIGISAFE LIMITED</p>
+                      <p className="text-[11px] font-black uppercase text-brand">PRIMEINVEST LIMITED</p>
                    </div>
                 </div>
              </div>

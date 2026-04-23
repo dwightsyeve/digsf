@@ -195,7 +195,7 @@ export default function Navbar() {
                   </div>
                   <div className="bg-white rounded-2xl p-4 border border-brand/5 space-y-2">
                     <p className="text-[10px] text-gray-400 font-bold uppercase">210462822 • OPAY</p>
-                    <p className="text-xs font-black uppercase text-brand">DIGISAFE LIMITED</p>
+                    <p className="text-xs font-black uppercase text-brand">PRIMEINVEST LIMITED</p>
                   </div>
                   <button 
                     onClick={() => {
