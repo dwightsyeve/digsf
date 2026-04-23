@@ -197,7 +197,7 @@ export default function Dashboard() {
            </div>
            <div className="flex gap-2">
               <button 
-                onClick={() => { setIsDepositOpen(true); setError(''); }}
+                onClick={() => window.dispatchEvent(new CustomEvent('open-deposit-modal'))}
                 className="px-5 py-2.5 bg-brand text-white rounded-full font-bold text-xs hover:translate-y-[-2px] transition-all shadow-lg shadow-brand/20"
               >
                 Deposit (₦)

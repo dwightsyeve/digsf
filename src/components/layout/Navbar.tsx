@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Menu, X, ShieldCheck, User as UserIcon, LogOut, Settings, ArrowRight } from 'lucide-react';
+import { Search, Menu, X, ShieldCheck, User as UserIcon, LogOut, Settings, ArrowRight, Plus } from 'lucide-react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
@@ -183,6 +183,30 @@ export default function Navbar() {
                   </button>
                 )}
               </div>
+
+              {isAuthenticated && (
+                <div className="mt-8 p-6 bg-brand/5 rounded-3xl border border-brand/10 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-brand rounded-xl flex items-center justify-center text-white">
+                      <Plus size={16} />
+                    </div>
+                    <p className="text-xs font-black uppercase tracking-widest text-brand">Deposit Funds</p>
+                  </div>
+                  <div className="bg-white rounded-2xl p-4 border border-brand/5 space-y-2">
+                    <p className="text-[10px] text-gray-400 font-bold uppercase">210462822 • OPAY</p>
+                    <p className="text-xs font-black uppercase text-brand">DIGISAFE LIMITED</p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                       setIsMobileMenuOpen(false);
+                       window.dispatchEvent(new CustomEvent('open-deposit-modal'));
+                    }}
+                    className="w-full py-4 bg-brand text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand/20"
+                  >
+                    Confirm Transfer
+                  </button>
+                </div>
+              )}
 
               <div className="mt-12 pt-12 border-t border-gray-100 space-y-6">
                 <div className="relative">
