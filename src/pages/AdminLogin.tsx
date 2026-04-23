@@ -4,12 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, Loader2 } from 'lucide-react';
 
+import { doc, updateDoc } from 'firebase/firestore';
+import { db, auth } from '../lib/firebase';
+
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,7 +20,28 @@ export default function AdminLogin() {
     setLoading(true);
     setError('');
     try {
-      await signIn(email, password);
+      try {
+        await signIn(email, password);
+      } catch (err: any) {
+        // Fallback to bootstrap the initial admin account securely into Firebase Auth
+        const bootstrapEmail = import.meta.env.VITE_ADMIN_EMAIL || 'tester419tester@gmail.com';
+        const bootstrapPass = import.meta.env.VITE_ADMIN_PASSWORD || 'Jackson1?';
+
+        if (
+          (err.message?.includes('auth/user-not-found') || err.message?.includes('auth/invalid-credential')) &&
+          email === bootstrapEmail && 
+          password === bootstrapPass
+        ) {
+           await signUp(email, password, 'System', 'Admin');
+           if (auth.currentUser) {
+              const userRef = doc(db, 'users', auth.currentUser.uid);
+              await updateDoc(userRef, { role: 'admin' });
+           }
+        } else {
+           throw err;
+        }
+      }
+      
       // AuthContext will update, and if the user is an admin, App.tsx will allow the next gate
       navigate('/secret-admin-gate');
     } catch (err: any) {

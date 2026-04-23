@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 email: firebaseUser.email!,
                 firstName: userData.firstName,
                 lastName: userData.lastName,
-                role: (firebaseUser.email === 'tester419tester@gmail.com') ? 'admin' : (userData.role || 'user'),
+                role: userData.role || 'user',
                 avatar: userData.avatar || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
                 walletBalance: userData.walletBalance || 0,
               } as User);
