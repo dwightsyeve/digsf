@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Menu, X, ShieldCheck, User as UserIcon, LogOut, Settings, ArrowRight, Plus } from 'lucide-react';
+import { Search, Menu, X, ShieldCheck, TrendingUp, User as UserIcon, LogOut, Settings, ArrowRight, Plus } from 'lucide-react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
@@ -45,10 +45,10 @@ export default function Navbar() {
 
         <Link to="/" className="flex items-center gap-2 group">
           <div className="w-10 h-10 bg-brand rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand/20 group-hover:scale-105 transition-transform">
-            <ShieldCheck size={24} />
+            <TrendingUp size={24} strokeWidth={2.5} />
           </div>
-          <span className="text-2xl font-bold text-gray-900 tracking-tight">
-            Digi<span className="text-brand">Safe</span>
+          <span className="text-2xl font-black text-gray-900 tracking-tight flex items-center">
+            Prime<span className="text-brand">Invest</span>
           </span>
         </Link>
         
@@ -148,10 +148,10 @@ export default function Navbar() {
               <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-50">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center text-white">
-                    <ShieldCheck size={20} />
+                    <TrendingUp size={20} strokeWidth={2.5} />
                   </div>
-                  <span className="text-xl font-bold text-gray-900 tracking-tight">
-                    Digi<span className="text-brand">Safe</span>
+                  <span className="text-xl font-black text-gray-900 tracking-tight flex items-center">
+                    Prime<span className="text-brand">Invest</span>
                   </span>
                 </div>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-400">
