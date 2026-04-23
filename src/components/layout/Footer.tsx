@@ -57,6 +57,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-400">
         <p>© 2026 PrimeInvest. All rights reserved.</p>
         <div className="flex gap-6">
+          <Link to="/admin-login" className="hover:text-brand transition-colors">Admin Login</Link>
           <Link to="/terms" className="hover:text-brand transition-colors">Terms & Conditions</Link>
           <Link to="/privacy" className="hover:text-brand transition-colors">Privacy Policy</Link>
         </div>

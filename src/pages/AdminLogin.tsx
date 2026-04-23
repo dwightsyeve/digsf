@@ -1,53 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, Loader2 } from 'lucide-react';
 
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
+import { signInWithPopup } from 'firebase/auth';
+import { googleProvider } from '../lib/firebase';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      navigate('/secret-admin-gate');
+    }
+  }, [user, navigate]);
+
+  const verifyAdminRole = async (userEmail: string, userId: string) => {
+    const bootstrapEmail = import.meta.env.VITE_ADMIN_EMAIL || 'tester419tester@gmail.com';
+    if (userEmail.toLowerCase().trim() === bootstrapEmail.toLowerCase().trim()) {
+       const userRef = doc(db, 'users', userId);
+       await updateDoc(userRef, { role: 'admin' });
+       return true;
+    }
+    return false;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     try {
-      try {
-        await signIn(email, password);
-      } catch (err: any) {
-        // Fallback to bootstrap the initial admin account securely into Firebase Auth
-        const bootstrapEmail = import.meta.env.VITE_ADMIN_EMAIL || 'tester419tester@gmail.com';
-        const bootstrapPass = import.meta.env.VITE_ADMIN_PASSWORD || 'Jackson1?';
+      const cleanEmail = email.toLowerCase().trim();
+      const bootstrapEmail = (import.meta.env.VITE_ADMIN_EMAIL || 'tester419tester@gmail.com').toLowerCase().trim();
+      const bootstrapPass = import.meta.env.VITE_ADMIN_PASSWORD || 'Jackson1?';
 
+      try {
+        await signIn(cleanEmail, password);
+        if (auth.currentUser) {
+           await verifyAdminRole(auth.currentUser.email || cleanEmail, auth.currentUser.uid);
+        }
+      } catch (err: any) {
         if (
-          (err.message?.includes('auth/user-not-found') || err.message?.includes('auth/invalid-credential')) &&
-          email === bootstrapEmail && 
+          cleanEmail === bootstrapEmail && 
           password === bootstrapPass
         ) {
-           await signUp(email, password, 'System', 'Admin');
+           try {
+             await signUp(cleanEmail, password, 'System', 'Admin');
+           } catch(signUpErr: any) {
+             // If email already exists, inform the user they need to link or use Google
+             if (signUpErr.message?.includes('already-in-use')) {
+               setError('Account exists. Please use "Admin Google Auth" to log in, or reset your password.');
+               setLoading(false);
+               return;
+             }
+             throw err; // throw original invalid credential error
+           }
            if (auth.currentUser) {
-              const userRef = doc(db, 'users', auth.currentUser.uid);
-              await updateDoc(userRef, { role: 'admin' });
+              await verifyAdminRole(cleanEmail, auth.currentUser.uid);
            }
         } else {
            throw err;
         }
       }
       
-      // AuthContext will update, and if the user is an admin, App.tsx will allow the next gate
-      navigate('/secret-admin-gate');
+      // useEffect will handle navigation once role is updated
     } catch (err: any) {
       setError(err.message || 'Invalid admin credentials');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleAdmin = async () => {
+    setLoading(true);
+    setError('');
+    try {
+       await signInWithGoogle();
+       if (auth.currentUser) {
+          const isAdmin = await verifyAdminRole(auth.currentUser.email || '', auth.currentUser.uid);
+          if (isAdmin) {
+             // useEffect will handle navigation
+             return;
+          } else {
+             // Not admin
+             setError('This Google account does not have admin privileges.');
+          }
+       }
+    } catch(err:any) {
+       setError(err.message || 'Failed to sign in with Google');
+    } finally {
+       setLoading(false);
     }
   };
 
@@ -94,13 +144,38 @@ export default function AdminLogin() {
 
            {error && <p className="text-xs text-red-500 font-bold text-center italic">{error}</p>}
 
-           <button 
-             type="submit"
-             disabled={loading}
-             className="w-full h-20 bg-brand text-white rounded-full text-xl font-bold hover:bg-[#6d1b1b] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-           >
-             {loading ? <Loader2 className="animate-spin" /> : 'Decrypt & Access'}
-           </button>
+           <div className="space-y-4">
+             <button 
+               type="submit"
+               disabled={loading}
+               className="w-full h-16 bg-brand text-white rounded-full text-lg font-bold hover:bg-[#6d1b1b] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+             >
+               {loading ? <Loader2 className="animate-spin" /> : 'Decrypt & Access'}
+             </button>
+
+             <div className="relative py-2">
+               <div className="absolute inset-0 flex items-center">
+                 <span className="w-full border-t border-white/10" />
+               </div>
+               <div className="relative flex justify-center text-[10px] font-black tracking-widest text-gray-500">
+                 <span className="bg-[#111] px-4">OR</span>
+               </div>
+             </div>
+
+             <button 
+               type="button"
+               disabled={loading}
+               onClick={handleGoogleAdmin}
+               className="w-full h-16 bg-white/5 border border-white/10 text-white rounded-full text-sm font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+             >
+               {loading ? <Loader2 className="animate-spin" /> : (
+                 <>
+                   <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
+                   Admin Google Auth
+                 </>
+               )}
+             </button>
+           </div>
         </form>
 
         <p className="text-center text-[10px] text-gray-600 font-medium">Unauthorized access attempts are logged.</p>

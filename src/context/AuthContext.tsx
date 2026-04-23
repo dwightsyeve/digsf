@@ -246,7 +246,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resetPassword = async (email: string) => {
     try {
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmail(auth, email, {
+        url: `${window.location.origin}/auth/action?mode=resetPassword`,
+        handleCodeInApp: false
+      });
     } catch (err) {
       throw new Error(formatError(err));
     }
