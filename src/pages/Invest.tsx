@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { addDoc, collection, serverTimestamp, doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useNavigate } from 'react-router-dom';
+import { formatError } from '../lib/utils';
 
 export default function Invest() {
   return (
@@ -109,7 +110,7 @@ function PlanCard({ title, roi, duration, min, icon, featured }: any) {
       setIsModalOpen(false);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Investment failed');
+      setError(formatError(err));
       setLoading(false);
     }
   };

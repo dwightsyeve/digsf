@@ -27,7 +27,8 @@ export default function Navbar() {
     { to: isAuthenticated ? "/dashboard" : "/", label: isAuthenticated ? "Dashboard" : "Home" },
     { to: isAuthenticated ? "/invest" : "/about", label: isAuthenticated ? "Invest" : "About Us" },
     { to: isAuthenticated ? "/withdraw" : "/careers", label: isAuthenticated ? "Withdraw" : "Careers" },
-    { to: "/contact", label: "Contact" },
+    { to: isAuthenticated ? "/settings" : "/contact", label: isAuthenticated ? "Settings" : "Contact" },
+    ...(isAuthenticated ? [{ to: "/contact", label: "Support" }] : [])
   ];
 
   return (

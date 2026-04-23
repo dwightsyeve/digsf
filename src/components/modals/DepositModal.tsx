@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { db, storage } from '../../lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { formatError } from '../../lib/utils';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -65,7 +66,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
       setReceiptFile(null);
       alert('Deposit submitted! Awaiting admin approval.');
     } catch (err: any) {
-      setError(err.message);
+      setError(formatError(err));
     } finally {
       setLoading(false);
     }

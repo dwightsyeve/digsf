@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { collection, query, where, onSnapshot, orderBy, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../lib/firebase';
+import { formatError } from '../lib/utils';
 
 const lineData = [
   { name: 'Day 1', value: 2000 },
@@ -153,7 +154,7 @@ export default function Dashboard() {
       setReceiptFile(null);
       alert('Deposit submitted! Awaiting admin approval.');
     } catch (err: any) {
-      setError(err.message);
+      setError(formatError(err));
     } finally {
       setLoading(false);
     }
@@ -181,7 +182,7 @@ export default function Dashboard() {
       setTransAmount(2000);
       alert('Withdrawal request pending admin approval.');
     } catch (err: any) {
-      setError(err.message);
+      setError(formatError(err));
     } finally {
       setLoading(false);
     }

@@ -11,6 +11,7 @@ import {
 import { doc, getDoc, setDoc, updateDoc, increment, collection, query, where, getDocs, addDoc, serverTimestamp, getDocFromServer, onSnapshot } from 'firebase/firestore';
 // auth, db, googleProvider, facebookProvider imports...
 import { auth, db, googleProvider, facebookProvider } from '../lib/firebase';
+import { formatError } from '../lib/utils';
 
 interface User {
   uid: string;
@@ -102,77 +103,93 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password?: string) => {
-    if (!password) throw new Error("Password required");
-    await signInWithEmailAndPassword(auth, email, password);
+    try {
+      if (!password) throw new Error("Password required");
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      throw new Error(formatError(err));
+    }
   };
 
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
-    const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
-    
-    // Check system settings for sign up bonus
-    let settings = { signupBonusEnabled: true, signupBonusAmount: 2000 };
     try {
-      const settingsDoc = await getDoc(doc(db, 'system', 'settings'));
-      if (settingsDoc.exists()) settings = { ...settings, ...settingsDoc.data() };
-    } catch (e) {
-      console.warn("Settings lookup failed during signup", e);
-    }
-    
-    const initialBalance = settings.signupBonusEnabled ? settings.signupBonusAmount : 0;
-
-    const referralCode = firebaseUser.uid.substring(0, 6).toUpperCase();
-    
-    // Check for referral
-    const urlParams = new URLSearchParams(window.location.search);
-    const referredBy = urlParams.get('ref');
-
-    const userData = {
-      uid: firebaseUser.uid,
-      email,
-      firstName,
-      lastName,
-      avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
-      createdAt: new Date().toISOString(),
-      walletBalance: initialBalance,
-      totalDeposited: 0,
-      totalWithdrawn: 0,
-      role: 'user',
-      referralCode,
-      referredBy: referredBy || null,
-      referralEarnings: 0,
-      bankDetails: {
-        bankName: '',
-        accountName: '',
-        accountNumber: ''
+      const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Check system settings for sign up bonus
+      let settings = { signupBonusEnabled: true, signupBonusAmount: 2000 };
+      try {
+        const settingsDoc = await getDoc(doc(db, 'system', 'settings'));
+        if (settingsDoc.exists()) settings = { ...settings, ...settingsDoc.data() };
+      } catch (e) {
+        // Silent fail for settings
       }
-    };
+      
+      const initialBalance = settings.signupBonusEnabled ? settings.signupBonusAmount : 0;
 
-    // Save to Firestore
-    await setDoc(doc(db, 'users', firebaseUser.uid), userData);
-    
-    // Update Firebase Profile
-    await updateProfile(firebaseUser, {
-      displayName: `${firstName} ${lastName}`
-    });
+      const referralCode = firebaseUser.uid.substring(0, 6).toUpperCase();
+      
+      // Check for referral
+      const urlParams = new URLSearchParams(window.location.search);
+      const referredBy = urlParams.get('ref');
 
-    setUser({
-      uid: firebaseUser.uid,
-      email,
-      firstName,
-      lastName,
-      role: 'user',
-      avatar: userData.avatar
-    });
+      const userData = {
+        uid: firebaseUser.uid,
+        email,
+        firstName,
+        lastName,
+        avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
+        createdAt: new Date().toISOString(),
+        walletBalance: initialBalance,
+        totalDeposited: 0,
+        totalWithdrawn: 0,
+        role: 'user',
+        referralCode,
+        referredBy: referredBy || null,
+        referralEarnings: 0,
+        bankDetails: {
+          bankName: '',
+          accountName: '',
+          accountNumber: ''
+        }
+      };
+
+      // Save to Firestore
+      await setDoc(doc(db, 'users', firebaseUser.uid), userData);
+      
+      // Update Profile Details
+      await updateProfile(firebaseUser, {
+        displayName: `${firstName} ${lastName}`
+      });
+
+      setUser({
+        uid: firebaseUser.uid,
+        email,
+        firstName,
+        lastName,
+        role: 'user',
+        avatar: userData.avatar
+      });
+    } catch (err) {
+      throw new Error(formatError(err));
+    }
   };
 
   const signInWithGoogle = async () => {
-    const { user: firebaseUser } = await signInWithPopup(auth, googleProvider);
-    await syncUser(firebaseUser);
+    try {
+      const { user: firebaseUser } = await signInWithPopup(auth, googleProvider);
+      await syncUser(firebaseUser);
+    } catch (err) {
+      throw new Error(formatError(err));
+    }
   };
 
   const signInWithFacebook = async () => {
-    const { user: firebaseUser } = await signInWithPopup(auth, facebookProvider);
-    await syncUser(firebaseUser);
+    try {
+      const { user: firebaseUser } = await signInWithPopup(auth, facebookProvider);
+      await syncUser(firebaseUser);
+    } catch (err) {
+      throw new Error(formatError(err));
+    }
   };
 
   const syncUser = async (firebaseUser: FirebaseUser) => {

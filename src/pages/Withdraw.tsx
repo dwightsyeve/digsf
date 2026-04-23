@@ -23,7 +23,7 @@ export default function Withdraw() {
       const num = parseFloat(value);
       if (!value) error = 'Amount is required';
       else if (isNaN(num)) error = 'Must be a valid number';
-      else if (num < 10000) error = 'Minimum amount is $10,000';
+      else if (num < 2000) error = 'Minimum amount is ₦2,000';
     }
     
     setErrors(prev => ({ ...prev, [field]: error }));
@@ -80,13 +80,13 @@ export default function Withdraw() {
           </div>
 
           <div className="space-y-4 md:space-y-6">
-            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Daily Transaction Limit: $1.00M</p>
+            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Daily Transaction Limit: ₦1.00M</p>
             <div className="h-2 md:h-2.5 bg-gray-100 rounded-full overflow-hidden">
                <div className="h-full bg-brand w-[10%]" />
             </div>
             <div className="flex justify-between text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400">
-              <span>Used: $100K</span>
-              <span>Rem: $900K</span>
+              <span>Used: ₦100K</span>
+              <span>Rem: ₦900K</span>
             </div>
           </div>
 
@@ -131,7 +131,7 @@ export default function Withdraw() {
 
           <div className="space-y-1">
             <div className="relative">
-              <span className="absolute left-8 top-1/2 -translate-y-1/2 text-xl md:text-2xl font-bold text-gray-300">$</span>
+              <span className="absolute left-8 top-1/2 -translate-y-1/2 text-xl md:text-2xl font-bold text-gray-300">₦</span>
               <input 
                 type="text" 
                 value={amount}
@@ -143,7 +143,7 @@ export default function Withdraw() {
             <div className="flex justify-between px-6">
               {errors.amount ? <p className="text-red-500 text-[10px] font-bold uppercase">{errors.amount}</p> : <div />}
               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                Min: <span className="text-black">$10K</span>
+                Min: <span className="text-black">₦2,000</span>
               </p>
             </div>
           </div>
