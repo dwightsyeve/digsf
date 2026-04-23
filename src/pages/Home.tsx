@@ -68,7 +68,7 @@ export default function Home() {
                         <div className="w-6 h-6 bg-brand rounded-lg flex items-center justify-center text-white scale-90">
                           <ShieldCheck size={16} />
                         </div>
-                        <p className="text-lg font-black tracking-tight">Digi<span className="text-brand">Safe</span></p>
+                        <p className="text-lg font-black tracking-tight">Prime<span className="text-brand">Invest</span></p>
                      </div>
                      <div className="w-10 h-10 rounded-full border-2 border-gray-50 overflow-hidden shadow-lg">
                         <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop" alt="User" />
@@ -134,7 +134,7 @@ export default function Home() {
         <div className="text-center space-y-4 md:space-y-6">
           <h2 className="text-4xl md:text-6xl font-bold text-black tracking-tight">Grow Your Wealth Safely</h2>
           <p className="text-base md:text-xl text-gray-400 max-w-3xl mx-auto font-medium">
-            DigiSafe provides institutional-grade tools that give you more control over your digital assets.
+            PrimeInvest provides institutional-grade tools that give you more control over your digital assets.
           </p>
         </div>
 
@@ -206,7 +206,7 @@ export default function Home() {
             <div className="relative space-y-6">
               <h2 className="text-4xl md:text-7xl font-bold text-white tracking-tight">Ready to secure your <br />digital future?</h2>
               <p className="text-xl text-white/80 max-w-2xl mx-auto font-medium">
-                Join 500,000+ investors who trust DigiSafe with their digital asset management.
+                Join 500,000+ investors who trust PrimeInvest with their digital asset management.
               </p>
               <div className="pt-4">
                 <Link to="/signup" className="inline-flex h-16 px-12 bg-white text-black rounded-full items-center justify-center text-xl font-black hover:scale-105 transition-transform shadow-2xl">

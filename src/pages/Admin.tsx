@@ -164,7 +164,7 @@ export default function AdminDashboard() {
           <h2 className="text-2xl font-black tracking-tighter flex items-center gap-2">
             <ShieldCheck className="text-brand" /> ADMIN PANEL
           </h2>
-          <p className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mt-2">DigiSafe Management v1.0</p>
+          <p className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mt-2">PrimeInvest Management v1.0</p>
         </div>
 
         <nav className="flex flex-col gap-2">

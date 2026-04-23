@@ -51,7 +51,7 @@ export default function AdminLogin() {
                    value={email}
                    onChange={e => setEmail(e.target.value)}
                    className="w-full h-16 bg-white/5 border border-white/10 rounded-full px-8 text-white focus:border-brand outline-none transition-all font-bold"
-                   placeholder="admin@digisafe.com"
+                   placeholder="admin@primeinvest.com"
                    required
                  />
               </div>

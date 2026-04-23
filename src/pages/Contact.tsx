@@ -15,7 +15,7 @@ export default function Contact() {
           
           <div className="space-y-6">
             <ContactItem icon={<Phone />} label="Phone" value="+1 (555) 000-0000" />
-            <ContactItem icon={<Mail />} label="Email" value="support@digisafe.com" />
+            <ContactItem icon={<Mail />} label="Email" value="support@primeinvest.com" />
             <ContactItem icon={<MapPin />} label="Office" value="123 Investment Way, Silicon Valley, CA" />
           </div>
         </div>

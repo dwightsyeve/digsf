@@ -6,9 +6,9 @@ export default function Footer() {
     <footer className="bg-white border-t border-gray-100 py-12 px-6 mt-auto">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-brand">DigiSafe</h2>
+          <h2 className="text-2xl font-bold text-brand">PrimeInvest</h2>
           <p className="text-gray-500 max-w-sm text-sm">
-            Empowering You to Build a Digitally Safe Investment Portfolio with DigiSafe.
+            Empowering You to Build a Digitally Safe Investment Portfolio with PrimeInvest.
           </p>
         </div>
 
@@ -55,7 +55,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-400">
-        <p>© 2026 DigiSafe. All rights reserved.</p>
+        <p>© 2026 PrimeInvest. All rights reserved.</p>
         <div className="flex gap-6">
           <Link to="/terms" className="hover:text-brand transition-colors">Terms & Conditions</Link>
           <Link to="/privacy" className="hover:text-brand transition-colors">Privacy Policy</Link>

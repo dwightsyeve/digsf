@@ -2,8 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
-const SYSTEM_INSTRUCTION = `You are DigiBot, the intelligent assistant for DigiSafe. 
-DigiSafe is a professional-grade digital asset management and investment platform.
+const SYSTEM_INSTRUCTION = `You are PrimeBot, the intelligent assistant for PrimeInvest. 
+PrimeInvest is a professional-grade digital asset management and investment platform.
 Key Features:
 - Secure asset storage with bank-level encryption.
 - Multiple investment plans (Basic, Pro, Institutional).

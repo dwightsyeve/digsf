@@ -4,7 +4,6 @@ import { Loader2, Plus, Copy, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { db, storage } from '../../lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { formatError } from '../../lib/utils';
 
 interface DepositModalProps {
@@ -33,7 +32,36 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
       setReceiptFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setReceiptUrl(reader.result as string);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Compress to JPEG with 0.7 quality
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          setReceiptUrl(dataUrl);
+        };
+        img.src = reader.result as string;
       };
       reader.readAsDataURL(file);
     }
@@ -47,15 +75,18 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
     try {
       if (amount < 2000) throw new Error('Minimum deposit is ₦2,000');
       
-      const storageRef = ref(storage, `receipts/${user.uid}/${Date.now()}_${receiptFile.name}`);
-      const uploadResult = await uploadBytes(storageRef, receiptFile);
-      const downloadUrl = await getDownloadURL(uploadResult.ref);
+      let finalReceiptUrl = receiptUrl;
+      
+      // If the image is to be stored directly in Firestore, base64 is already in receiptUrl.
+      if (!finalReceiptUrl) {
+        return setError('Please upload a transfer receipt');
+      }
 
       await addDoc(collection(db, 'deposits'), {
         userId: user.uid,
         userEmail: user.email,
         amount: amount,
-        receiptUrl: downloadUrl,
+        receiptUrl: finalReceiptUrl,
         status: 'pending',
         createdAt: new Date().toISOString()
       });
@@ -112,7 +143,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                      </button>
                   </div>
                   <p className="text-xs font-bold text-gray-500">OPAY DIGITAL BANK (NIGERIA)</p>
-                  <p className="text-xs font-black text-brand">DIGISAFE LIMITED</p>
+                  <p className="text-xs font-black text-brand">PRIMEINVEST LIMITED</p>
                </div>
             </div>
 

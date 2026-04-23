@@ -66,7 +66,7 @@ export default function SignIn() {
                   <div className="space-y-4">
                     <div className="space-y-1">
                        <h3 className="text-2xl font-bold text-black">Hey, Jimmy</h3>
-                       <p className="text-[9px] text-gray-300 leading-tight">Secure your digital future with DigiSafe assets.</p>
+                       <p className="text-[9px] text-gray-300 leading-tight">Secure your digital future with PrimeInvest assets.</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 text-white">
