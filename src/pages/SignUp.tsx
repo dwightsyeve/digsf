@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2 } from 'lucide-react';
 
@@ -9,10 +9,21 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { signUp, signInWithGoogle, signInWithFacebook, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  React.useEffect(() => {
+    // Check URL parameters for referral code
+    const params = new URLSearchParams(location.search);
+    const ref = params.get('ref');
+    if (ref && !referralCode) {
+      setReferralCode(ref);
+    }
+  }, [location]);
 
   React.useEffect(() => {
     if (isAuthenticated) {
@@ -25,6 +36,9 @@ export default function SignUp() {
     setError('');
     setLoading(true);
     try {
+      if (referralCode.trim()) {
+        sessionStorage.setItem('referralCode', referralCode.trim());
+      }
       await signUp(email, password, firstName, lastName);
       navigate('/dashboard');
     } catch (err: any) {
@@ -37,6 +51,9 @@ export default function SignUp() {
     setError('');
     setLoading(true);
     try {
+      if (referralCode.trim()) {
+        sessionStorage.setItem('referralCode', referralCode.trim());
+      }
       if (provider === 'google') await signInWithGoogle();
       else await signInWithFacebook();
       navigate('/dashboard');
@@ -102,9 +119,16 @@ export default function SignUp() {
           />
           <input className="input-pill h-11 text-sm font-semibold" type="password" placeholder="Confirm Password*" required disabled={loading} />
           <div className="grid grid-cols-3 gap-3 md:gap-4">
-            <input className="input-pill h-11 text-sm font-semibold" type="text" placeholder="Code" disabled={loading} />
+            <input className="input-pill h-11 text-sm font-semibold" type="text" placeholder="Mobile Number" disabled={loading} />
             <div className="col-span-2">
-              <input className="input-pill h-11 text-sm font-semibold" type="text" placeholder="Mobile Number" disabled={loading} />
+              <input 
+                 className="input-pill h-11 text-sm font-semibold border-brand/20 bg-brand/5 focus:bg-white" 
+                 type="text" 
+                 placeholder="Referral Code (Optional)" 
+                 value={referralCode}
+                 onChange={(e) => setReferralCode(e.target.value)}
+                 disabled={loading} 
+              />
             </div>
           </div>
 

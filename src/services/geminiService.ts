@@ -1,6 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+let ai: GoogleGenAI | null = null;
+function getAI() {
+  if (!ai) {
+    ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+  }
+  return ai;
+}
 
 const SYSTEM_INSTRUCTION = `You are PrimeBot, the intelligent assistant for PrimeInvest. 
 PrimeInvest is a professional-grade digital asset management and investment platform.
@@ -20,7 +26,8 @@ Always be polite and proactive.`;
 
 export async function getChatResponse(message: string, history: { role: 'user' | 'model', parts: [{ text: string }] }[] = []) {
   try {
-    const response = await ai.models.generateContent({
+    const aiInstance = getAI();
+    const response = await aiInstance.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: [
         ...history,
@@ -33,8 +40,8 @@ export async function getChatResponse(message: string, history: { role: 'user' |
     });
 
     return response.text;
-  } catch (error) {
-    console.error("Gemini Error:", error);
-    return "I'm sorry, I'm having trouble connecting to my brain right now. Please try again later.";
-  }
+    } catch (error: any) {
+      console.error("Gemini Error:", error);
+      return `I'm sorry, I'm having trouble connecting to my brain right now. Please try again later. (Error: ${error?.message || String(error)})`;
+    }
 }

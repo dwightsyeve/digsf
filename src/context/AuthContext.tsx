@@ -129,8 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const referralCode = firebaseUser.uid.substring(0, 6).toUpperCase();
       
       // Check for referral
-      const urlParams = new URLSearchParams(window.location.search);
-      const referredBy = urlParams.get('ref');
+      const referredBy = sessionStorage.getItem('referralCode') || new URLSearchParams(window.location.search).get('ref');
 
       const userData = {
         uid: firebaseUser.uid,
@@ -160,6 +159,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await updateProfile(firebaseUser, {
         displayName: `${firstName} ${lastName}`
       });
+
+      sessionStorage.removeItem('referralCode');
 
       setUser({
         uid: firebaseUser.uid,
@@ -208,8 +209,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const initialBalance = settings.signupBonusEnabled ? settings.signupBonusAmount : 0;
         const referralCode = firebaseUser.uid.substring(0, 6).toUpperCase();
-        const urlParams = new URLSearchParams(window.location.search);
-        const referredBy = urlParams.get('ref');
+        const referredBy = sessionStorage.getItem('referralCode') || new URLSearchParams(window.location.search).get('ref');
 
         const userData = {
           uid: firebaseUser.uid,
@@ -233,6 +233,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
 
         await setDoc(doc(db, 'users', firebaseUser.uid), userData);
+        sessionStorage.removeItem('referralCode');
       }
     } catch (err) {
       console.error("syncUser failed:", err);

@@ -182,7 +182,8 @@ function ProfileSettings() {
   const [gender, setGender] = useState('Male');
   const [country, setCountry] = useState('Nigeria');
   const [mobile, setMobile] = useState('');
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState(user?.address || '');
+  const [avatarStr, setAvatarStr] = useState(user?.avatar || '');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -191,8 +192,53 @@ function ProfileSettings() {
       setFirstName(user.firstName || '');
       setLastName(user.lastName || '');
       setEmail(user.email || '');
+      setAddress(user.address || '');
+      setAvatarStr(user.avatar || '');
     }
   }, [user]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // basic resizing logic can go here, but doing simple Base64 for now
+        // A simple canvas resize to save DB space
+        const img = new Image();
+        img.src = reader.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 400;
+          const MAX_HEIGHT = 400;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          setAvatarStr(dataUrl);
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDeletePhoto = () => {
+    setAvatarStr('');
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -205,7 +251,8 @@ function ProfileSettings() {
         gender,
         country,
         mobile,
-        address
+        address,
+        avatar: avatarStr
       });
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
@@ -221,12 +268,20 @@ function ProfileSettings() {
        <div className="flex items-center gap-12">
         <div className="relative group">
           <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-xl">
-            <img src={user?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200'} alt="Avatar" className="w-full h-full object-cover" />
+            <img src={avatarStr || user?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200'} alt="Avatar" className="w-full h-full object-cover" />
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-6">
-          <button className="h-14 px-10 bg-brand text-white rounded-2xl font-bold hover:bg-[#6d1b1b] transition-all">Upload New</button>
-          <button className="h-14 px-10 bg-gray-100 text-gray-500 rounded-2xl font-bold hover:bg-gray-200 transition-all">Delete photo</button>
+          <div className="relative h-14 px-10 bg-brand text-white rounded-2xl font-bold hover:bg-[#6d1b1b] transition-all flex items-center justify-center cursor-pointer overflow-hidden">
+            <span className="pointer-events-none text-sm z-10 whitespace-nowrap">Upload New</span>
+            <input 
+              type="file" 
+              accept="image/*"
+              onChange={handleFileChange}
+              className="absolute inset-0 opacity-0 cursor-pointer z-20 w-full"
+            />
+          </div>
+          <button type="button" onClick={handleDeletePhoto} className="h-14 px-10 bg-gray-100 text-gray-500 rounded-2xl font-bold hover:bg-gray-200 transition-all text-sm whitespace-nowrap z-30">Delete photo</button>
         </div>
       </div>
 

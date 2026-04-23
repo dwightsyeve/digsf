@@ -34,6 +34,7 @@ export default function Dashboard() {
   const [deposits, setDeposits] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [activePlanDetails, setActivePlanDetails] = useState<any>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -95,12 +96,26 @@ export default function Dashboard() {
     const now = new Date().getTime();
     const end = new Date(inv.endDate).getTime();
     
-    const daysPassed = Math.min(
-      inv.durationDays,
-      Math.floor((now - start) / (1000 * 60 * 60 * 24))
-    );
+    let daysPassedPrecise = (now - start) / (1000 * 60 * 60 * 24);
+    if (daysPassedPrecise < 0) daysPassedPrecise = 0;
+    
+    const durationDays = inv.durationDays || 30; // fallback
+    if (daysPassedPrecise > durationDays) daysPassedPrecise = durationDays;
 
-    const currentAccruedTotal = inv.dailyBreakdown?.slice(0, daysPassed).reduce((s: number, v: number) => s + v, 0) || 0;
+    let currentAccruedTotal = 0;
+    if (inv.dailyBreakdown && Array.isArray(inv.dailyBreakdown) && inv.dailyBreakdown.length > 0) {
+        const fullDays = Math.floor(daysPassedPrecise);
+        const fraction = daysPassedPrecise - fullDays;
+        currentAccruedTotal = inv.dailyBreakdown.slice(0, fullDays).reduce((s: number, v: number) => s + v, 0);
+        if (fullDays < inv.dailyBreakdown.length) {
+            currentAccruedTotal += inv.dailyBreakdown[fullDays] * fraction;
+        }
+    } else {
+        // Fallback for broken DB items
+        const expected = inv.totalExpectedProfit || (inv.amount * (inv.roiPercent || 0) / 100);
+        const daily = expected / durationDays;
+        currentAccruedTotal = daily * daysPassedPrecise;
+    }
     
     // Available to Withdraw Logic (capped at 50% until maturity)
     const principalLimit = inv.amount * 0.5;
@@ -111,7 +126,15 @@ export default function Dashboard() {
       ? currentProfit 
       : Math.min(currentProfit, Math.max(0, principalLimit - (inv.withdrawnProfit || 0)));
 
-    return { ...inv, currentAccruedTotal, availableFromThis, hasEnded };
+    return { 
+      ...inv, 
+      currentAccruedTotal, 
+      availableFromThis, 
+      hasEnded,
+      durationDays,
+      daysPassedPrecise,
+      progressPercent: Math.min(100, Math.max(0, (daysPassedPrecise / durationDays) * 100))
+    };
   });
 
   const activeInvestments = processedInvestments.filter(i => i.status === 'active');
@@ -234,12 +257,12 @@ export default function Dashboard() {
             <div>
                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Your Referral Link</p>
                <p className="font-mono text-xs font-bold text-brand break-all">
-                  {window.location.origin}/signup?ref={user?.referralCode}
+                  {window.location.origin}/signup?ref={user?.referralCode || user?.uid?.substring(0,6).toUpperCase()}
                </p>
             </div>
             <button 
               onClick={() => {
-                navigator.clipboard.writeText(`${window.location.origin}/signup?ref=${user?.referralCode}`);
+                navigator.clipboard.writeText(`${window.location.origin}/signup?ref=${user?.referralCode || user?.uid?.substring(0,6).toUpperCase()}`);
                 alert('Referral link copied!');
               }}
               className="px-5 h-10 bg-black text-white rounded-full font-bold text-[10px] whitespace-nowrap hover:bg-gray-800 transition-all"
@@ -313,13 +336,17 @@ export default function Dashboard() {
           <h3 className="text-base md:text-lg font-bold text-black">Active Performance</h3>
           <div className="space-y-3 overflow-y-auto max-h-[250px] pr-2">
             {processedInvestments.length > 0 ? processedInvestments.map(inv => (
-              <div key={inv.id} className="p-3 rounded-2xl border border-gray-50 flex justify-between items-center">
+              <div 
+                key={inv.id} 
+                onClick={() => setActivePlanDetails(inv)}
+                className="p-3 rounded-2xl border border-gray-50 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer"
+              >
                  <div>
                     <p className="font-bold text-sm text-black">{inv.plan} Plan</p>
                     <p className="text-[10px] text-gray-400">Principal: ₦{inv.amount.toLocaleString()}</p>
                  </div>
                  <div className="text-right">
-                    <p className="font-bold text-sm text-green-600">+₦{inv.currentAccruedTotal.toLocaleString()}</p>
+                    <p className="font-bold text-sm text-green-600">+₦{inv.currentAccruedTotal.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2})}</p>
                     <p className="text-[9px] uppercase font-bold text-gray-400 tracking-tighter">Current ROI</p>
                  </div>
               </div>
@@ -329,6 +356,68 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {activePlanDetails && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActivePlanDetails(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white w-full max-w-lg rounded-[32px] p-6 md:p-8 shadow-2xl relative z-10 space-y-6"
+            >
+               <div className="flex items-center justify-between">
+                 <h3 className="text-2xl font-bold text-black">{activePlanDetails.plan} Plan</h3>
+                 <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase tracking-widest">{activePlanDetails.status}</span>
+               </div>
+               
+               <div className="space-y-4">
+                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-2xl">
+                     <span className="text-sm font-bold text-gray-500">Principal Amount</span>
+                     <span className="text-lg font-black text-black">₦{activePlanDetails.amount.toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-2xl">
+                     <span className="text-sm font-bold text-gray-500">Current ROI</span>
+                     <span className="text-lg font-black text-green-600">+₦{activePlanDetails.currentAccruedTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-2xl">
+                     <span className="text-sm font-bold text-gray-500">Expected Total ROI</span>
+                     <span className="text-lg font-black text-black">₦{(activePlanDetails.totalExpectedProfit || (activePlanDetails.amount * (activePlanDetails.roiPercent || 0) / 100)).toLocaleString()}</span>
+                  </div>
+
+                  <div className="space-y-2 pt-2">
+                     <div className="flex justify-between text-xs font-bold text-gray-400">
+                       <span>{new Date(activePlanDetails.startDate).toLocaleDateString()}</span>
+                       <span>{new Date(activePlanDetails.endDate).toLocaleDateString()}</span>
+                     </div>
+                     <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+                       <div className="h-full bg-brand rounded-full transition-all duration-1000" style={{ width: `${activePlanDetails.progressPercent}%` }} />
+                     </div>
+                     <p className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-1">
+                       {activePlanDetails.daysPassedPrecise.toFixed(1)} / {activePlanDetails.durationDays} Days Completed
+                     </p>
+                  </div>
+               </div>
+               
+               <button 
+                 onClick={() => setActivePlanDetails(null)}
+                 className="w-full h-12 bg-gray-100 text-gray-900 rounded-full text-base font-bold hover:bg-gray-200 transition-all"
+               >
+                 Close
+               </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {(isDepositOpen || isWithdrawOpen) && (
