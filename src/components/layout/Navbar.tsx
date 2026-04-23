@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Menu, X, ShieldCheck, User as UserIcon, LogOut, Settings } from 'lucide-react';
+import { Search, Menu, X, ShieldCheck, User as UserIcon, LogOut, Settings, ArrowRight } from 'lucide-react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
@@ -73,12 +73,18 @@ export default function Navbar() {
 
         <div className="flex items-center gap-2 md:gap-4">
           {isAuthenticated ? (
-            <div className="flex items-center gap-3 md:gap-4 font-bold">
-              <span className="hidden sm:inline text-sm text-gray-900">Hey, {user?.firstName}</span>
+            <div className="flex items-center gap-2 md:gap-4 font-bold">
+              <div className="hidden sm:flex flex-col items-end leading-none">
+                <span className="text-sm text-gray-900">Hey, {user?.firstName}</span>
+                <span className="text-[10px] text-brand uppercase tracking-tighter">Verified Account</span>
+              </div>
               
               <div className="relative group">
-                <button className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-brand-muted p-0.5 overflow-hidden transition-all group-hover:border-brand">
-                  <img src={user?.avatar} alt={user?.firstName} className="w-full h-full rounded-full object-cover" />
+                <button className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 p-1 md:p-1.5 rounded-full border border-gray-100 transition-all group-hover:border-brand/30">
+                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-white overflow-hidden shadow-sm">
+                    <img src={user?.avatar} alt={user?.firstName} className="w-full h-full rounded-full object-cover" />
+                  </div>
+                  <Menu size={16} className="text-gray-400 mr-1 hidden md:block" />
                 </button>
                 
                 <div className="absolute right-0 top-full pt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
@@ -107,12 +113,15 @@ export default function Navbar() {
               </div>
             </div>
           ) : (
-            <Link to="/signin" className="text-sm font-semibold text-gray-900 hover:text-brand px-3 md:px-4 py-2 flex items-center gap-2">
-              <span className="hidden xs:inline">Sign In</span>
-              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                 <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gray-200" />
-              </div>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/signin" className="hidden sm:block text-sm font-bold text-gray-500 hover:text-gray-900 px-4 py-2 transition-colors">
+                Login
+              </Link>
+              <Link to="/signup" className="btn-brand h-10 px-6 text-sm shadow-lg shadow-brand/20 flex items-center gap-2">
+                 <span>Join Now</span>
+                 <ArrowRight size={16} />
+              </Link>
+            </div>
           )}
         </div>
       </div>
