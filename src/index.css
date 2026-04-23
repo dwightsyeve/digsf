@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-brand: #802020;
+  --color-brand-muted: #F3E8E8;
+  --color-card-gray: #E5E5E5;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+}
+
+body {
+  @apply font-sans text-gray-900 bg-white;
+}
+
+@utility input-pill {
+  @apply w-full h-14 px-8 rounded-full border border-gray-200 outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-all bg-white text-gray-700 placeholder:text-gray-300;
+}
+
+@utility btn-pill {
+  @apply h-14 px-10 rounded-full font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2;
+}
+
+@utility btn-brand {
+  @apply btn-pill bg-brand text-white hover:bg-[#6d1b1b] shadow-lg shadow-brand/10;
+}
+
+@utility btn-outline {
+  @apply btn-pill border border-gray-200 bg-white text-gray-700 hover:bg-gray-50;
+}
+
+@utility dashboard-card-solid {
+  @apply bg-brand text-white p-6 rounded-3xl shadow-sm border border-brand;
+}
+
+@utility dashboard-card-outline {
+  @apply bg-white border border-gray-100 text-brand p-6 rounded-3xl shadow-sm hover:border-brand/30 transition-colors;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-200 rounded-full;
+}
+

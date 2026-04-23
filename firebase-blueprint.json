@@ -1,0 +1,135 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "avatar": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "walletBalance": { "type": "number", "description": "Withdrawable balance (Naira)" },
+        "totalDeposited": { "type": "number" },
+        "totalWithdrawn": { "type": "number" },
+        "bankDetails": {
+          "type": "object",
+          "properties": {
+            "bankName": { "type": "string" },
+            "accountName": { "type": "string" },
+            "accountNumber": { "type": "string" }
+          }
+        },
+        "role": { "type": "string", "enum": ["user", "admin"] }
+      },
+      "required": ["uid", "email"]
+    },
+    "Deposit": {
+      "title": "Deposit",
+      "description": "User deposit requests with receipt",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "receiptUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Withdrawal": {
+      "title": "Withdrawal",
+      "description": "User withdrawal requests",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "bankDetails": {
+          "type": "object",
+          "properties": {
+            "bankName": { "type": "string" },
+            "accountName": { "type": "string" },
+            "accountNumber": { "type": "string" }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System or admin notifications",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Can be 'all' for broadcast" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["info", "success", "warning", "critical"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "SystemSetting": {
+      "title": "SystemSetting",
+      "description": "Global app configurations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "signupBonusEnabled": { "type": "boolean" },
+        "signupBonusAmount": { "type": "number" }
+      }
+    },
+    "Investment": {
+      "title": "Investment",
+      "description": "Active or completed investment plans",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "plan": { "type": "string", "enum": ["30 Days", "60 Days", "90 Days"] },
+        "amount": { "type": "number", "description": "Principal amount in NGN" },
+        "roiPercent": { "type": "number", "description": "Total ROI profit percentage" },
+        "totalExpectedProfit": { "type": "number" },
+        "durationDays": { "type": "number" },
+        "startDate": { "type": "string", "format": "date-time" },
+        "endDate": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["active", "completed"] },
+        "accruedProfit": { "type": "number" },
+        "withdrawnProfit": { "type": "number" },
+        "dailyBreakdown": { "type": "array", "items": { "type": "number" } }
+      },
+      "required": ["userId", "plan", "amount", "status"]
+    },
+    "Withdrawal": {
+      "title": "Withdrawal",
+      "description": "Withdrawal requests",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amount": { "type": "number" },
+        "bank": { "type": "string" },
+        "accountNumber": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "processed", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "narration": { "type": "string" }
+      },
+      "required": ["userId", "amount", "bank", "accountNumber", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Primary user profile document"
+    },
+    "/investments/{investmentId}": {
+      "schema": "Investment",
+      "description": "A collection of all investments"
+    },
+    "/withdrawals/{withdrawalId}": {
+      "schema": "Withdrawal",
+      "description": "A collection of withdrawal requests"
+    }
+  }
+}
