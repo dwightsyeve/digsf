@@ -188,23 +188,23 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 space-y-8 md:space-y-12">
-      <header className="space-y-4 md:space-y-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-6 md:space-y-8">
+      <header className="space-y-3 md:space-y-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
            <div className="space-y-1">
-              <h1 className="text-4xl md:text-5xl font-bold text-black tracking-tight">Hey, {user?.firstName}</h1>
-              <p className="text-gray-400 font-medium md:text-lg">Real-time assets in Nigerian Naira (₦).</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-black tracking-tight">Hey, {user?.firstName}</h1>
+              <p className="text-gray-400 font-medium md:text-base">Real-time assets in Nigerian Naira (₦).</p>
            </div>
-           <div className="flex gap-3">
+           <div className="flex gap-2">
               <button 
                 onClick={() => { setIsDepositOpen(true); setError(''); }}
-                className="px-6 py-3 bg-brand text-white rounded-full font-bold text-sm hover:translate-y-[-2px] transition-all shadow-lg shadow-brand/20"
+                className="px-5 py-2.5 bg-brand text-white rounded-full font-bold text-xs hover:translate-y-[-2px] transition-all shadow-lg shadow-brand/20"
               >
                 Deposit (₦)
               </button>
               <button 
                 onClick={() => { setIsWithdrawOpen(true); setError(''); }}
-                className="px-6 py-3 bg-gray-100 text-gray-900 rounded-full font-bold text-sm hover:bg-gray-200 transition-all"
+                className="px-5 py-2.5 bg-gray-100 text-gray-900 rounded-full font-bold text-xs hover:bg-gray-200 transition-all"
               >
                 Withdraw
               </button>
@@ -220,19 +220,19 @@ export default function Dashboard() {
         <StatCard title="Wallet (Cash)" value={`₦${liquidWalletBalance.toLocaleString()}`} variant="outline" />
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-6 sm:gap-16 pt-4 items-end border-b border-gray-100 pb-12">
+      <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 pt-4 items-end border-b border-gray-100 pb-8">
          <div className="space-y-1">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Signup Bonus (Protected)</p>
-            <p className="text-4xl font-bold text-black">₦{user?.signupBonus?.toLocaleString() || '0'}</p>
+            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Signup Bonus (Protected)</p>
+            <p className="text-3xl font-bold text-black">₦{user?.signupBonus?.toLocaleString() || '0'}</p>
          </div>
          <div className="space-y-1">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Plans</p>
-            <p className="text-4xl font-bold text-black">{activeInvestments.length}</p>
+            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Active Plans</p>
+            <p className="text-3xl font-bold text-black">{activeInvestments.length}</p>
          </div>
-         <div className="flex-1 bg-gray-50 border border-gray-100 p-6 rounded-3xl flex items-center justify-between gap-4">
+         <div className="flex-1 bg-gray-50 border border-gray-100 p-5 rounded-2xl flex items-center justify-between gap-4">
             <div>
-               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Your Referral Link</p>
-               <p className="font-mono text-sm font-bold text-brand break-all">
+               <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Your Referral Link</p>
+               <p className="font-mono text-xs font-bold text-brand break-all">
                   {window.location.origin}/signup?ref={user?.referralCode}
                </p>
             </div>
@@ -241,7 +241,7 @@ export default function Dashboard() {
                 navigator.clipboard.writeText(`${window.location.origin}/signup?ref=${user?.referralCode}`);
                 alert('Referral link copied!');
               }}
-              className="px-6 h-12 bg-black text-white rounded-full font-bold text-xs whitespace-nowrap hover:bg-gray-800 transition-all"
+              className="px-5 h-10 bg-black text-white rounded-full font-bold text-[10px] whitespace-nowrap hover:bg-gray-800 transition-all"
             >
               Copy Link
             </button>
@@ -250,17 +250,17 @@ export default function Dashboard() {
 
       {/* Notifications Section */}
       {notifications.length > 0 && (
-        <div className="space-y-4">
-           <h3 className="text-xl font-bold flex items-center gap-2"><Bell className="text-brand" size={20} /> Latest Updates</h3>
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-3">
+           <h3 className="text-lg font-bold flex items-center gap-2"><Bell className="text-brand" size={16} /> Latest Updates</h3>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {notifications.sort((a:any, b:any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 4).map((n:any) => (
-                <div key={n.id} className="p-6 bg-white border border-gray-100 rounded-3xl shadow-sm flex gap-4 items-start">
-                   <div className="w-10 h-10 bg-brand-muted rounded-2xl flex items-center justify-center shrink-0">
-                      <Bell size={18} className="text-brand" />
+                <div key={n.id} className="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm flex gap-3 items-start">
+                   <div className="w-8 h-8 bg-brand-muted rounded-xl flex items-center justify-center shrink-0">
+                      <Bell size={14} className="text-brand" />
                    </div>
                    <div>
-                      <p className="font-bold text-black">{n.title}</p>
-                      <p className="text-sm text-gray-400 font-medium">{n.message}</p>
+                      <p className="font-bold text-sm text-black">{n.title}</p>
+                      <p className="text-xs text-gray-400 font-medium">{n.message}</p>
                    </div>
                 </div>
               ))}
@@ -270,32 +270,32 @@ export default function Dashboard() {
 
       {/* Pending Transactions Section */}
       {(deposits.some(d => d.status === 'pending') || withdrawals.some(w => w.status === 'pending')) && (
-        <div className="bg-orange-50 border border-orange-100 p-8 rounded-[40px] space-y-6">
-           <div className="flex items-center gap-3 text-orange-800">
-              <Loader2 className="animate-spin" size={24} />
-              <h3 className="text-xl font-bold">Processing Operations</h3>
+        <div className="bg-orange-50 border border-orange-100 p-6 rounded-[32px] space-y-4">
+           <div className="flex items-center gap-2 text-orange-800">
+              <Loader2 className="animate-spin" size={20} />
+              <h3 className="text-lg font-bold">Processing Operations</h3>
            </div>
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {deposits.filter(d => d.status === 'pending').map(d => (
-                <div key={d.id} className="bg-white/50 p-6 rounded-3xl border border-orange-200">
-                   <p className="text-[10px] font-bold uppercase text-orange-600">Pending Refill</p>
-                   <p className="text-2xl font-black text-black">₦{d.amount.toLocaleString()}</p>
+                <div key={d.id} className="bg-white/50 p-4 rounded-2xl border border-orange-200">
+                   <p className="text-[9px] font-bold uppercase text-orange-600">Pending Refill</p>
+                   <p className="text-xl font-black text-black">₦{d.amount.toLocaleString()}</p>
                 </div>
               ))}
               {withdrawals.filter(w => w.status === 'pending').map(w => (
-                <div key={w.id} className="bg-white/50 p-6 rounded-3xl border border-orange-200">
-                   <p className="text-[10px] font-bold uppercase text-orange-600">Withdrawal Request</p>
-                   <p className="text-2xl font-black text-black">₦{w.amount.toLocaleString()}</p>
+                <div key={w.id} className="bg-white/50 p-4 rounded-2xl border border-orange-200">
+                   <p className="text-[9px] font-bold uppercase text-orange-600">Withdrawal Request</p>
+                   <p className="text-xl font-black text-black">₦{w.amount.toLocaleString()}</p>
                 </div>
               ))}
            </div>
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-6 md:gap-12">
-        <div className="bg-white p-6 md:p-10 rounded-[32px] md:rounded-[50px] border border-gray-100 shadow-sm space-y-6 md:space-y-8">
-          <h3 className="text-lg md:text-xl font-bold text-black">Growth Analytics</h3>
-          <div className="h-48 md:h-64 w-full">
+      <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+        <div className="bg-white p-6 md:p-8 rounded-[24px] md:rounded-[32px] border border-gray-100 shadow-sm space-y-4 md:space-y-6">
+          <h3 className="text-base md:text-lg font-bold text-black">Growth Analytics</h3>
+          <div className="h-40 md:h-52 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={lineData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
@@ -308,18 +308,18 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-6 md:p-10 rounded-[32px] md:rounded-[50px] border border-gray-100 shadow-sm space-y-6 md:space-y-8">
-          <h3 className="text-lg md:text-xl font-bold text-black">Active Performance</h3>
-          <div className="space-y-4 overflow-y-auto max-h-[300px] pr-2">
+        <div className="bg-white p-6 md:p-8 rounded-[24px] md:rounded-[32px] border border-gray-100 shadow-sm space-y-4 md:space-y-6">
+          <h3 className="text-base md:text-lg font-bold text-black">Active Performance</h3>
+          <div className="space-y-3 overflow-y-auto max-h-[250px] pr-2">
             {processedInvestments.length > 0 ? processedInvestments.map(inv => (
-              <div key={inv.id} className="p-4 rounded-3xl border border-gray-50 flex justify-between items-center">
+              <div key={inv.id} className="p-3 rounded-2xl border border-gray-50 flex justify-between items-center">
                  <div>
-                    <p className="font-bold text-black">{inv.plan} Plan</p>
-                    <p className="text-xs text-gray-400">Principal: ₦{inv.amount.toLocaleString()}</p>
+                    <p className="font-bold text-sm text-black">{inv.plan} Plan</p>
+                    <p className="text-[10px] text-gray-400">Principal: ₦{inv.amount.toLocaleString()}</p>
                  </div>
                  <div className="text-right">
-                    <p className="font-bold text-green-600">+₦{inv.currentAccruedTotal.toLocaleString()}</p>
-                    <p className="text-[10px] uppercase font-bold text-gray-400 tracking-tighter">Current ROI</p>
+                    <p className="font-bold text-sm text-green-600">+₦{inv.currentAccruedTotal.toLocaleString()}</p>
+                    <p className="text-[9px] uppercase font-bold text-gray-400 tracking-tighter">Current ROI</p>
                  </div>
               </div>
             )) : (
@@ -343,36 +343,36 @@ export default function Dashboard() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-white w-full max-w-lg rounded-[40px] p-8 md:p-12 shadow-2xl relative z-10 space-y-8"
+              className="bg-white w-full max-w-lg rounded-[32px] p-6 md:p-8 shadow-2xl relative z-10 space-y-6"
             >
-              <div className="space-y-2">
-                <h3 className="text-3xl font-bold text-black">
+              <div className="space-y-1">
+                <h3 className="text-2xl font-bold text-black">
                   {isDepositOpen ? 'Deposit Funds' : 'Withdraw Profit'}
                 </h3>
-                <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">
+                <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">
                   ₦2,000 Minimum
                 </p>
               </div>
 
-              <div className="space-y-4">
-                <label className="text-sm font-bold text-gray-400 ml-1">Amount (₦)*</label>
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-gray-400 ml-1">Amount (₦)*</label>
                 <input 
                   type="number"
                   value={transAmount}
                   onChange={(e) => setTransAmount(Number(e.target.value))}
-                  className="input-pill h-16 text-xl font-bold"
+                  className="input-pill h-12 text-base font-bold"
                   placeholder="Min ₦2,000"
                 />
                 {!isDepositOpen && (
-                   <div className="bg-brand-muted p-4 rounded-2xl">
-                      <p className="text-xs text-brand font-bold">Max Withdrawable Now: ₦{availableToWithdraw.toLocaleString()}</p>
-                      <p className="text-[10px] text-brand/60 mt-1 leading-tight italic">Note: Only up to 50% of your principal can be withdrawn before the plan matures.</p>
+                   <div className="bg-brand-muted p-3 rounded-xl">
+                      <p className="text-[10px] text-brand font-bold">Max Withdrawable Now: ₦{availableToWithdraw.toLocaleString()}</p>
+                      <p className="text-[9px] text-brand/60 mt-0.5 leading-tight italic">Note: Only up to 50% of your principal can be withdrawn before the plan matures.</p>
                    </div>
                 )}
                 {isDepositOpen && (
-                  <div className="space-y-4 pt-4">
-                    <label className="text-sm font-bold text-gray-400 ml-1">Upload Transfer Receipt (Image)*</label>
-                    <div className="relative h-32 border-2 border-dashed border-gray-100 rounded-3xl flex flex-col items-center justify-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer overflow-hidden">
+                  <div className="space-y-3 pt-2">
+                    <label className="text-xs font-bold text-gray-400 ml-1">Upload Transfer Receipt (Image)*</label>
+                    <div className="relative h-24 border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-gray-50 transition-colors cursor-pointer overflow-hidden">
                        <input 
                          type="file" 
                          accept="image/*"
@@ -383,8 +383,8 @@ export default function Dashboard() {
                          <img src={receiptUrl} className="w-full h-full object-cover" />
                        ) : (
                          <>
-                            <Plus className="text-gray-300" />
-                            <p className="text-xs font-bold text-gray-400">Click to select receipt</p>
+                            <Plus className="text-gray-300" size={16} />
+                            <p className="text-[10px] font-bold text-gray-400">Select receipt</p>
                          </>
                        )}
                     </div>
@@ -392,20 +392,20 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {error && <p className="text-sm font-bold text-red-500 bg-red-50 p-4 rounded-2xl italic">{error}</p>}
+              {error && <p className="text-xs font-bold text-red-500 bg-red-50 p-3 rounded-xl italic">{error}</p>}
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 <button 
                   onClick={isDepositOpen ? submitDeposit : submitWithdrawal}
                   disabled={loading}
-                  className="w-full h-16 md:h-20 bg-brand text-white rounded-full text-xl font-bold hover:bg-[#6d1b1b] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl shadow-brand/20"
+                  className="w-full h-12 bg-brand text-white rounded-full text-base font-bold hover:bg-[#6d1b1b] transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-brand/20"
                 >
-                  {loading ? <Loader2 className="animate-spin" /> : <>{isDepositOpen ? 'Send for Approval' : 'Request Payout'}</>}
+                  {loading ? <Loader2 className="animate-spin" size={16} /> : <>{isDepositOpen ? 'Send for Approval' : 'Request Payout'}</>}
                 </button>
                 <button 
                   onClick={() => { setIsDepositOpen(false); setIsWithdrawOpen(false); }}
                   disabled={loading}
-                  className="w-full h-14 text-gray-400 font-bold hover:text-gray-900 transition-colors"
+                  className="w-full h-10 text-gray-400 font-bold text-xs hover:text-gray-900 transition-colors"
                 >
                   Cancel
                 </button>
@@ -421,11 +421,11 @@ export default function Dashboard() {
 function StatCard({ title, value, variant = "solid", showTrend }: { title: string; value: string; variant?: 'solid' | 'outline'; showTrend?: boolean }) {
   return (
     <div className={variant === 'solid' ? 'dashboard-card-solid' : 'dashboard-card-outline'}>
-      <div className="flex justify-between items-start mb-4">
-        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">{title}</p>
-        {showTrend && <TrendingUp className="w-4 h-4" />}
+      <div className="flex justify-between items-start mb-2">
+        <p className="text-[9px] font-bold uppercase tracking-widest opacity-80">{title}</p>
+        {showTrend && <TrendingUp className="w-4 h-4 opacity-50" />}
       </div>
-      <p className="text-3xl font-extrabold tracking-tight leading-none">{value}</p>
+      <p className="text-2xl font-extrabold tracking-tight leading-none">{value}</p>
     </div>
   );
 }

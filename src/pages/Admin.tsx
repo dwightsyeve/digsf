@@ -384,47 +384,47 @@ function TransactionList({ items, type, onApprove, onDecline }: any) {
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
        {items.filter((i: any) => i.status === 'pending').map((item: any) => (
-         <div key={item.id} className="p-8 border-2 border-brand-muted rounded-[32px] space-y-6 bg-brand-muted/5 animate-fade-in">
+         <div key={item.id} className="p-6 border-2 border-brand-muted rounded-2xl space-y-4 bg-brand-muted/5 animate-fade-in">
             <div className="flex justify-between items-start">
-               <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
-                     {type === 'deposit' ? <ArrowDownCircle className="text-brand" /> : <ArrowUpCircle className="text-blue-500" />}
+               <div className="flex gap-3">
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                     {type === 'deposit' ? <ArrowDownCircle size={20} className="text-brand" /> : <ArrowUpCircle size={20} className="text-blue-500" />}
                   </div>
                   <div>
-                     <p className="font-bold text-lg text-black">{type === 'deposit' ? 'Refill Request' : 'Payout Request'}</p>
-                     <p className="text-sm text-gray-400 font-medium">{item.userEmail} • {new Date(item.createdAt).toLocaleString()}</p>
+                     <p className="font-bold text-base text-black">{type === 'deposit' ? 'Refill Request' : 'Payout Request'}</p>
+                     <p className="text-[10px] text-gray-400 font-medium">{item.userEmail} • {new Date(item.createdAt).toLocaleString()}</p>
                   </div>
                </div>
                <div className="text-right">
-                  <p className="text-2xl font-black text-black">₦{item.amount.toLocaleString()}</p>
+                  <p className="text-xl font-black text-black">₦{item.amount.toLocaleString()}</p>
                   {type === 'deposit' && item.receiptUrl && (
                     <button 
                       onClick={() => setSelectedReceipt(item.receiptUrl)}
-                      className="mt-2 flex items-center gap-1 text-[10px] uppercase font-bold text-brand hover:underline"
+                      className="mt-1 flex items-center gap-1 text-[9px] uppercase font-bold text-brand hover:underline"
                     >
-                      <ImageIcon size={12} /> View Receipt
+                      <ImageIcon size={10} /> View Receipt
                     </button>
                   )}
                   {type === 'withdrawal' && item.bankDetails && (
-                    <p className="text-xs text-gray-400 mt-1">{item.bankDetails.bankName} • {item.bankDetails.accountNumber}</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">{item.bankDetails.bankName} • {item.bankDetails.accountNumber}</p>
                   )}
                </div>
             </div>
 
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-3 pt-2">
                <button 
                  onClick={() => onApprove(item)}
-                 className="flex-1 h-14 bg-brand text-white rounded-full font-bold hover:bg-[#6d1b1b] transition-all flex items-center justify-center gap-2"
+                 className="flex-1 h-10 bg-brand text-white rounded-full font-bold text-xs hover:bg-[#6d1b1b] transition-all flex items-center justify-center gap-2"
                >
-                 <CheckCircle2 size={18} /> Approve
+                 <CheckCircle2 size={14} /> Approve
                </button>
                <button 
                  onClick={() => onDecline(item)}
-                 className="h-14 px-8 border border-gray-100 text-gray-400 rounded-full font-bold hover:bg-gray-50 flex items-center gap-2"
+                 className="h-10 px-6 border border-gray-100 text-gray-400 rounded-full font-bold text-xs hover:bg-gray-50 flex items-center gap-2"
                >
-                 <XCircle size={18} /> Decline
+                 <XCircle size={14} /> Decline
                </button>
             </div>
          </div>
@@ -543,19 +543,19 @@ function NotificationCenter({ users }: { users: any[] }) {
   };
 
   return (
-    <div className="max-w-2xl space-y-10">
-       <div className="space-y-6">
-          <div className="space-y-4">
-             <label className="text-sm font-bold text-gray-400 ml-1">Title</label>
-             <input value={title} onChange={e => setTitle(e.target.value)} className="w-full h-16 px-8 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:bg-white font-bold" />
+    <div className="max-w-xl space-y-6">
+       <div className="space-y-4">
+          <div className="space-y-2">
+             <label className="text-xs font-bold text-gray-400 ml-1">Title</label>
+             <input value={title} onChange={e => setTitle(e.target.value)} className="w-full h-12 px-6 rounded-xl bg-gray-50 border border-gray-100 outline-none focus:bg-white font-bold text-sm" />
           </div>
-          <div className="space-y-4">
-             <label className="text-sm font-bold text-gray-400 ml-1">Message</label>
-             <textarea value={message} onChange={e => setMessage(e.target.value)} className="w-full h-40 p-8 rounded-3xl bg-gray-50 border border-gray-100 outline-none focus:bg-white font-medium italic" />
+          <div className="space-y-2">
+             <label className="text-xs font-bold text-gray-400 ml-1">Message</label>
+             <textarea value={message} onChange={e => setMessage(e.target.value)} className="w-full h-32 p-6 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:bg-white font-medium text-sm italic" />
           </div>
-          <div className="space-y-4">
-             <label className="text-sm font-bold text-gray-400 ml-1">Target Audience</label>
-             <select value={target} onChange={e => setTarget(e.target.value)} className="w-full h-16 px-8 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:bg-white font-bold appearance-none">
+          <div className="space-y-2">
+             <label className="text-xs font-bold text-gray-400 ml-1">Target Audience</label>
+             <select value={target} onChange={e => setTarget(e.target.value)} className="w-full h-12 px-6 rounded-xl bg-gray-50 border border-gray-100 outline-none focus:bg-white font-bold text-sm appearance-none">
                 <option value="all">Broadcast to All Users</option>
                 {users.map(u => <option key={u.id} value={u.id}>{u.firstName} {u.lastName} ({u.email})</option>)}
              </select>
@@ -565,9 +565,9 @@ function NotificationCenter({ users }: { users: any[] }) {
        <button 
          onClick={sendNotification}
          disabled={loading}
-         className="w-full h-20 bg-brand text-white rounded-full text-xl font-bold hover:bg-[#6d1b1b] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+         className="w-full h-14 bg-brand text-white rounded-full text-base font-bold hover:bg-[#6d1b1b] transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-brand/10"
        >
-         {loading ? <Loader2 className="animate-spin" /> : 'Blast Notification'}
+         {loading ? <Loader2 className="animate-spin" size={18} /> : 'Blast Notification'}
        </button>
     </div>
   );

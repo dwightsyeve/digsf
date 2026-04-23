@@ -16,11 +16,11 @@ body {
 }
 
 @utility input-pill {
-  @apply w-full h-14 px-8 rounded-full border border-gray-200 outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-all bg-white text-gray-700 placeholder:text-gray-300;
+  @apply w-full h-12 px-6 rounded-full border border-gray-200 outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-all bg-white text-gray-700 placeholder:text-gray-300 text-sm;
 }
 
 @utility btn-pill {
-  @apply h-14 px-10 rounded-full font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2;
+  @apply h-12 px-8 rounded-full font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm;
 }
 
 @utility btn-brand {
