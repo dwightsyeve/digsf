@@ -17,6 +17,7 @@ import Contact from './pages/Contact';
 
 import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
+import AuthAction from './pages/AuthAction';
 
 function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode, adminOnly?: boolean }) {
   const { isAuthenticated, user, loading } = useAuth();
@@ -68,7 +69,11 @@ export default function App() {
             <Route path="/secret-admin-gate" element={
               <ProtectedRoute adminOnly><Admin /></ProtectedRoute>
             } />
-            
+
+            {/* Auth Action Route (Password Reset, Email Verification) */}
+            <Route path="/auth/action" element={<AuthAction />} />
+            <Route path="/__/auth/action" element={<AuthAction />} />
+
             {/* Redirects */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

@@ -6,7 +6,8 @@ import {
   User as FirebaseUser,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, increment, collection, query, where, getDocs, addDoc, serverTimestamp, getDocFromServer, onSnapshot } from 'firebase/firestore';
 // auth, db, googleProvider, facebookProvider imports...
@@ -30,6 +31,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signInWithFacebook: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
 }
@@ -161,6 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       sessionStorage.removeItem('referralCode');
+      sessionStorage.setItem('isNewSignup', 'true');
 
       setUser({
         uid: firebaseUser.uid,
@@ -234,9 +237,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         await setDoc(doc(db, 'users', firebaseUser.uid), userData);
         sessionStorage.removeItem('referralCode');
+        sessionStorage.setItem('isNewSignup', 'true');
       }
     } catch (err) {
       console.error("syncUser failed:", err);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (err) {
+      throw new Error(formatError(err));
     }
   };
 
@@ -253,6 +265,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signUp,
       signInWithGoogle,
       signInWithFacebook,
+      resetPassword,
       signOut, 
       isAuthenticated: !!user 
     }}>

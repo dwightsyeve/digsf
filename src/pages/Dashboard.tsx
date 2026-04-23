@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, Loader2, Shield, Bell, Plus } from 'lucide-react';
+import { TrendingUp, Loader2, Shield, Bell, Plus, Sparkles, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { collection, query, where, onSnapshot, orderBy, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -35,6 +35,14 @@ export default function Dashboard() {
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [activePlanDetails, setActivePlanDetails] = useState<any>(null);
+  const [showWelcome, setShowWelcome] = useState(() => {
+    return sessionStorage.getItem('isNewSignup') === 'true';
+  });
+
+  const dismissWelcome = () => {
+    setShowWelcome(false);
+    sessionStorage.removeItem('isNewSignup');
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -356,6 +364,59 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showWelcome && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={dismissWelcome}
+              className="absolute inset-0 bg-brand/90 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white w-full max-w-xl rounded-[48px] p-8 md:p-12 shadow-2xl relative z-10 text-center space-y-8 overflow-hidden"
+            >
+              {/* Decorative Background */}
+              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-orange-50 to-white -z-10" />
+              
+              <button onClick={dismissWelcome} className="absolute top-6 right-6 w-10 h-10 bg-gray-50 text-gray-400 hover:text-gray-900 rounded-full flex items-center justify-center transition-colors">
+                 <X size={20} />
+              </button>
+
+              <div className="w-20 h-20 bg-brand rounded-3xl flex items-center justify-center text-white shadow-xl shadow-brand/20 mx-auto transform -rotate-6">
+                 <Sparkles size={40} className="animate-pulse" />
+              </div>
+
+              <div className="space-y-4">
+                 <h2 className="text-4xl font-black text-gray-900 tracking-tight">
+                    Welcome to Prime<span className="text-brand">Invest</span>, {user?.firstName}!
+                 </h2>
+                 <p className="text-gray-500 text-lg max-w-md mx-auto leading-relaxed">
+                    We're thrilled to have you. Your account has been securely set up and your digital vault is ready. Let's make your digital assets work for you.
+                 </p>
+              </div>
+
+              <div className="bg-orange-50 border border-orange-100 p-6 rounded-3xl mx-auto max-w-sm transform hover:scale-105 transition-transform cursor-pointer" onClick={dismissWelcome}>
+                 <p className="text-xs font-bold text-orange-600 uppercase tracking-widest mb-1">Signup Bonus Added</p>
+                 <p className="text-4xl font-black text-black">₦{user?.signupBonus?.toLocaleString() || '2,000'}</p>
+                 <p className="text-[10px] text-orange-800 font-medium mt-2">Ready to be deployed into any active plan.</p>
+              </div>
+
+              <button 
+                onClick={dismissWelcome}
+                className="w-full h-14 bg-black text-white rounded-full text-lg font-bold hover:bg-gray-800 transition-all shadow-xl"
+              >
+                Go to Dashboard
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {activePlanDetails && (

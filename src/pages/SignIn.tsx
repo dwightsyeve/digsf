@@ -7,8 +7,10 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signInWithGoogle, signInWithFacebook, isAuthenticated } = useAuth();
+  const [isResetMode, setIsResetMode] = useState(false);
+  const { signIn, signInWithGoogle, signInWithFacebook, resetPassword, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -20,12 +22,20 @@ export default function SignIn() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setMessage('');
     setLoading(true);
     try {
-      await signIn(email, password);
-      navigate('/dashboard');
+      if (isResetMode) {
+        await resetPassword(email);
+        setMessage('Password reset link sent! Check your inbox.');
+        setIsResetMode(false);
+      } else {
+        await signIn(email, password);
+        navigate('/dashboard');
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
+      setError(err.message || (isResetMode ? 'Failed to reset password' : 'Failed to sign in'));
+    } finally {
       setLoading(false);
     }
   };
@@ -88,8 +98,8 @@ export default function SignIn() {
       {/* Right: Form section */}
       <div className="flex-1 w-full max-w-md space-y-6 md:space-y-8 animate-slide-up">
         <header className="text-center md:text-left">
-          <h1 className="text-4xl md:text-5xl font-bold text-black tracking-tight">Login</h1>
-          <p className="text-gray-400 font-medium text-sm mt-2">Access your digital vault and manage assets.</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-black tracking-tight">{isResetMode ? 'Reset Password' : 'Login'}</h1>
+          <p className="text-gray-400 font-medium text-sm mt-2">{isResetMode ? 'Enter your email to receive a password reset link.' : 'Access your digital vault and manage assets.'}</p>
         </header>
 
         {error && (
@@ -97,46 +107,54 @@ export default function SignIn() {
             {error}
           </div>
         )}
-
-        <div className="space-y-3 md:space-y-4 text-center">
-          <div className="space-y-2 md:space-y-3">
-              <button 
-                type="button"
-                disabled={loading}
-                onClick={() => handleOAuth('google')}
-                className="w-full h-11 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center gap-3 hover:bg-gray-100 transition-all px-6 disabled:opacity-50"
-              >
-                {loading ? <Loader2 className="animate-spin text-gray-400" size={18} /> : (
-                  <>
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
-                    <span className="text-sm font-semibold text-gray-700">Continue with Google</span>
-                  </>
-                )}
-              </button>
-              <button 
-                type="button"
-                disabled={loading}
-                onClick={() => handleOAuth('facebook')}
-                className="w-full h-11 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center gap-3 hover:bg-gray-100 transition-all px-6 disabled:opacity-50"
-              >
-                {loading ? <Loader2 className="animate-spin text-gray-400" size={18} /> : (
-                  <>
-                    <img src="https://www.svgrepo.com/show/448224/facebook.svg" className="w-5 h-5" alt="Facebook" />
-                    <span className="text-sm font-semibold text-gray-700">Continue with Facebook</span>
-                  </>
-                )}
-              </button>
+        
+        {message && (
+          <div className="bg-green-50 text-green-600 p-3 rounded-xl text-xs font-bold border border-green-100">
+            {message}
           </div>
+        )}
 
-          <div className="relative py-2 md:py-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-100" />
+        {!isResetMode && (
+          <div className="space-y-3 md:space-y-4 text-center">
+            <div className="space-y-2 md:space-y-3">
+                <button 
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleOAuth('google')}
+                  className="w-full h-11 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center gap-3 hover:bg-gray-100 transition-all px-6 disabled:opacity-50"
+                >
+                  {loading ? <Loader2 className="animate-spin text-gray-400" size={18} /> : (
+                    <>
+                      <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
+                      <span className="text-sm font-semibold text-gray-700">Continue with Google</span>
+                    </>
+                  )}
+                </button>
+                <button 
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleOAuth('facebook')}
+                  className="w-full h-11 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center gap-3 hover:bg-gray-100 transition-all px-6 disabled:opacity-50"
+                >
+                  {loading ? <Loader2 className="animate-spin text-gray-400" size={18} /> : (
+                    <>
+                      <img src="https://www.svgrepo.com/show/448224/facebook.svg" className="w-5 h-5" alt="Facebook" />
+                      <span className="text-sm font-semibold text-gray-700">Continue with Facebook</span>
+                    </>
+                  )}
+                </button>
             </div>
-            <div className="relative flex justify-center text-[10px] font-black tracking-widest text-gray-300">
-              <span className="bg-white px-4">OR</span>
+
+            <div className="relative py-2 md:py-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-100" />
+              </div>
+              <div className="relative flex justify-center text-[10px] font-black tracking-widest text-gray-300">
+                <span className="bg-white px-4">OR</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
           <div className="space-y-2 md:space-y-3">
@@ -149,21 +167,25 @@ export default function SignIn() {
               placeholder="Email ID*"
               className="input-pill text-sm font-semibold h-11 transition-all"
             />
-            <input 
-              type="password" 
-              required
-              disabled={loading}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password*"
-              className="input-pill text-sm font-semibold h-11 transition-all"
-            />
+            {!isResetMode && (
+              <input 
+                type="password" 
+                required
+                disabled={loading}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password*"
+                className="input-pill text-sm font-semibold h-11 transition-all"
+              />
+            )}
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2">
-             <button type="button" disabled={loading} className="text-xs font-bold text-gray-400 hover:text-brand order-2 sm:order-1 disabled:opacity-50">Forgot Password?</button>
+             <button type="button" disabled={loading} onClick={() => { setIsResetMode(!isResetMode); setError(''); setMessage(''); }} className="text-xs font-bold text-gray-400 hover:text-brand order-2 sm:order-1 disabled:opacity-50">
+               {isResetMode ? 'Back to Login' : 'Forgot Password?'}
+             </button>
              <button type="submit" disabled={loading} className="w-full sm:w-auto h-11 px-10 bg-brand text-white rounded-full text-sm font-bold hover:bg-[#6d1b1b] transition-all shadow-lg shadow-brand/20 order-1 sm:order-2 flex items-center justify-center gap-2">
-               {loading ? <Loader2 className="animate-spin" size={18} /> : 'Sign In'}
+               {loading ? <Loader2 className="animate-spin" size={18} /> : (isResetMode ? 'Send Link' : 'Sign In')}
              </button>
           </div>
         </form>
