@@ -52,37 +52,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           unsubscribeSnapshot = onSnapshot(doc(db, 'users', firebaseUser.uid), (userDoc) => {
             if (userDoc.exists()) {
               const userData = userDoc.data();
+              const bootstrapEmail = import.meta.env.VITE_ADMIN_EMAIL || 'tester419tester@gmail.com';
+              const isSuperAdmin = firebaseUser.email?.toLowerCase().trim() === bootstrapEmail.toLowerCase().trim();
+
               setUser({
                 uid: firebaseUser.uid,
                 email: firebaseUser.email!,
                 firstName: userData.firstName,
                 lastName: userData.lastName,
-                role: userData.role || 'user',
+                role: isSuperAdmin ? 'admin' : (userData.role || 'user'),
                 avatar: userData.avatar || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
                 walletBalance: userData.walletBalance || 0,
               } as User);
             } else {
-              // Initial sync for social login users without a doc yet
+              // Initial sync for users without a doc yet
+              const bootstrapEmail = import.meta.env.VITE_ADMIN_EMAIL || 'tester419tester@gmail.com';
+              const isSuperAdmin = firebaseUser.email?.toLowerCase().trim() === bootstrapEmail.toLowerCase().trim();
+
               setUser({
                 uid: firebaseUser.uid,
                 email: firebaseUser.email!,
                 firstName: firebaseUser.displayName?.split(' ')[0] || 'User',
                 lastName: firebaseUser.displayName?.split(' ')[1] || '',
-                role: 'user',
+                role: isSuperAdmin ? 'admin' : 'user',
                 avatar: firebaseUser.photoURL || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
-              });
+                walletBalance: 0,
+              } as User);
             }
             setLoading(false);
           }, (error) => {
             console.error("User snapshot error:", error);
             // Fallback for offline or permission errors so app isn't stuck
             if (!user) {
+              const bootstrapEmail = import.meta.env.VITE_ADMIN_EMAIL || 'tester419tester@gmail.com';
+              const isSuperAdmin = firebaseUser.email?.toLowerCase().trim() === bootstrapEmail.toLowerCase().trim();
+
               setUser({
                 uid: firebaseUser.uid,
                 email: firebaseUser.email!,
                 firstName: firebaseUser.displayName?.split(' ')[0] || 'User',
                 lastName: firebaseUser.displayName?.split(' ')[1] || '',
-                role: 'user',
+                role: isSuperAdmin ? 'admin' : 'user',
               } as User);
             }
             setLoading(false);

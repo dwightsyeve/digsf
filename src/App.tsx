@@ -34,7 +34,7 @@ function ProtectedRoute({ children, adminOnly = false }: { children: React.React
   }
 
   if (!isAuthenticated) return <Navigate to="/signin" replace />;
-  if (adminOnly && user?.role !== 'admin' && user?.email !== 'tester419tester@gmail.com') return <Navigate to="/dashboard" replace />;
+  if (adminOnly && user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 }
 

@@ -31,7 +31,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'users' | 'deposits' | 'withdrawals' | 'settings' | 'notifications'>('users');
 
   // Authorization Check
-  if (user?.role !== 'admin' && user?.email !== 'tester419tester@gmail.com') {
+  if (user?.role !== 'admin') {
     return <Navigate to="/dashboard" replace />;
   }
 
