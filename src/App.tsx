@@ -14,6 +14,9 @@ import Settings from './pages/Settings';
 import Invest from './pages/Invest';
 import Careers from './pages/Careers';
 import Contact from './pages/Contact';
+import Help from './pages/Help';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 
 import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
@@ -50,6 +53,9 @@ export default function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/careers" element={<Careers />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
             
             <Route path="/dashboard" element={
               <ProtectedRoute><Dashboard /></ProtectedRoute>

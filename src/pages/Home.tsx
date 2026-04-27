@@ -42,13 +42,26 @@ export default function Home() {
 
           <div className="flex items-center justify-center lg:justify-start gap-8 pt-4">
              <div className="flex -space-x-3">
-                {[1,2,3,4].map(i => (
+                {[
+                  "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=100&h=100&fit=crop",
+                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+                  "https://images.unsplash.com/photo-1548142813-c348350df52b?w=100&h=100&fit=crop",
+                  "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=100&h=100&fit=crop"
+                ].map((src, i) => (
                   <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-100 overflow-hidden shadow-sm">
-                    <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="User" />
+                    <img src={src} alt="User" referrerPolicy="no-referrer" />
                   </div>
                 ))}
              </div>
-             <p className="text-sm font-bold text-gray-400">Trusted by <span className="text-black">12,000+</span> elite investors</p>
+             <div className="flex flex-col text-left">
+               <div className="flex items-center gap-1">
+                 {[1,2,3,4,5].map(i => (
+                   <svg key={i} className="w-3 h-3 text-green-500 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                 ))}
+                 <span className="text-[10px] font-black text-black ml-1">Trustpilot</span>
+               </div>
+               <p className="text-sm font-bold text-gray-400 leading-tight">Trusted by <span className="text-black">12,000+</span> elite investors</p>
+             </div>
           </div>
         </motion.div>
 
@@ -66,12 +79,12 @@ export default function Home() {
                      <div className="flex gap-1.5"><div className="w-2 h-2 bg-black/10 rounded-full" /><div className="w-2 h-2 bg-black/10 rounded-full" /></div>
                      <div className="flex items-center gap-1.5">
                         <div className="w-6 h-6 bg-brand rounded-lg flex items-center justify-center text-white scale-90">
-                          <ShieldCheck size={16} />
+                           <ShieldCheck size={16} />
                         </div>
                         <p className="text-lg font-black tracking-tight">Prime<span className="text-brand">Invest</span></p>
                      </div>
                      <div className="w-10 h-10 rounded-full border-2 border-gray-50 overflow-hidden shadow-lg">
-                        <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop" alt="User" />
+                        <img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=100&h=100&fit=crop" alt="User" referrerPolicy="no-referrer" />
                      </div>
                   </header>
 
@@ -86,7 +99,7 @@ export default function Home() {
                           <div className="flex justify-between items-end">
                              <div>
                                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total Balance</p>
-                                <p className="text-4xl font-black text-black">$248,590</p>
+                                <p className="text-4xl font-black text-black">₦248,590</p>
                              </div>
                              <div className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-black">
                                 +12.5%

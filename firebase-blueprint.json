@@ -116,6 +116,35 @@
         "narration": { "type": "string" }
       },
       "required": ["userId", "amount", "bank", "accountNumber", "status"]
+    },
+    "SupportMessage": {
+      "title": "SupportMessage",
+      "description": "Real-time support chat messages",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The user involved in the chat" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "text": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "isAdmin": { "type": "boolean" },
+        "isRead": { "type": "boolean" }
+      },
+      "required": ["userId", "senderId", "text", "timestamp"]
+    },
+    "ContactInquiry": {
+      "title": "ContactInquiry",
+      "description": "Submissions from the contact form",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["new", "replied", "closed"] }
+      },
+      "required": ["name", "email", "message", "timestamp"]
     }
   },
   "firestore": {
@@ -130,6 +159,14 @@
     "/withdrawals/{withdrawalId}": {
       "schema": "Withdrawal",
       "description": "A collection of withdrawal requests"
+    },
+    "/support_messages/{messageId}": {
+      "schema": "SupportMessage",
+      "description": "A collection of support chat messages"
+    },
+    "/contact_inquiries/{inquiryId}": {
+      "schema": "ContactInquiry",
+      "description": "A collection of contact form submissions"
     }
   }
 }

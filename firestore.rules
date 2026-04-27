@@ -17,11 +17,10 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      // In a real app, we check a protected collection. 
-      // For this session, we'll allow the specific user's email or check the /admins/ collection.
+      // We check the user's document for the admin role, or fallback to the hardcoded email
       return isSignedIn() && (
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
-        request.auth.token.email == 'tester419tester@gmail.com'
+        request.auth.token.email == 'tester419tester@gmail.com' ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
       );
     }
 
@@ -124,6 +123,23 @@ service cloud.firestore {
     match /admins/{adminId} {
       allow read: if isSignedIn();
       allow write: if false; // Only manageable via console or specialized tool
+    }
+
+    // 8. Support Messages
+    match /support_messages/{msgId} {
+      allow list, get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && (
+        (incoming().userId == request.auth.uid && !incoming().isAdmin) ||
+        (isAdmin() && incoming().isAdmin)
+      );
+      allow update: if isAdmin();
+    }
+
+    // 9. Contact Inquiries
+    match /contact_inquiries/{inquiryId} {
+      allow list, get: if isAdmin();
+      allow create: if true; // Public can submit contact form
+      allow update: if isAdmin();
     }
   }
 }

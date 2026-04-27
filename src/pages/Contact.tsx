@@ -1,9 +1,31 @@
-import React from 'react';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import { Mail, Phone, MapPin, CheckCircle2, Loader2 } from 'lucide-react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export default function Contact() {
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) return;
+    setSending(true);
+    try {
+      await addDoc(collection(db, 'contact_inquiries'), {
+        ...formData,
+        timestamp: new Date().toISOString(),
+        status: 'new'
+      });
+      setSent(true);
+      setFormData({ name: '', email: '', message: '' });
+    } catch (e) { alert('Submission failed. Please try again.'); }
+    finally { setSending(false); }
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12 space-y-12 animate-fade-in">
+    <div className="max-w-6xl mx-auto px-6 py-12 space-y-12 animate-fade-in min-h-screen">
       <h1 className="text-4xl md:text-5xl font-bold text-black tracking-tight text-center">Get in Touch</h1>
       
       <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-start">
@@ -20,12 +42,59 @@ export default function Contact() {
           </div>
         </div>
 
-        <form className="space-y-4 bg-white p-8 md:p-10 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-100/50">
-           <input className="input-pill h-11 text-sm font-semibold" type="text" placeholder="Full Name" />
-           <input className="input-pill h-11 text-sm font-semibold" type="email" placeholder="Email Address" />
-           <textarea className="w-full h-32 p-6 rounded-[24px] border border-gray-100 outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 transition-all font-semibold text-sm text-gray-700 resize-none bg-gray-50/50" placeholder="Your Message" />
-           <button className="btn-brand w-full h-11 text-sm">Send Message</button>
-        </form>
+        <div className="relative">
+          {sent ? (
+            <div className="bg-white p-12 rounded-[40px] border border-gray-100 shadow-xl text-center space-y-4 animate-scale-in">
+               <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle2 size={40} />
+               </div>
+               <h3 className="text-2xl font-bold text-black">Message Sent!</h3>
+               <p className="text-gray-400 text-sm font-medium px-4">Thank you for reaching out. Our team will review your inquiry and get back to you shortly via email.</p>
+               <button onClick={() => setSent(false)} className="text-brand font-bold text-sm hover:underline">Send another message</button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4 bg-white p-8 md:p-10 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-100/50 relative overflow-hidden">
+               <div className="space-y-2">
+                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Full Name</label>
+                 <input 
+                    required
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    className="input-pill h-11 text-sm font-semibold" 
+                    type="text" 
+                    placeholder="e.g. John Doe" 
+                 />
+               </div>
+               <div className="space-y-2">
+                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Email Address</label>
+                 <input 
+                    required
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    className="input-pill h-11 text-sm font-semibold" 
+                    type="email" 
+                    placeholder="e.g. john@example.com" 
+                 />
+               </div>
+               <div className="space-y-2">
+                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Message</label>
+                 <textarea 
+                    required
+                    value={formData.message}
+                    onChange={e => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full h-32 p-6 rounded-[24px] border border-gray-100 outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 transition-all font-semibold text-sm text-gray-700 resize-none bg-gray-50/50" 
+                    placeholder="How can we help?" 
+                 />
+               </div>
+               <button 
+                  disabled={sending}
+                  className="btn-brand w-full h-14 text-sm font-black flex items-center justify-center gap-2"
+               >
+                  {sending ? <Loader2 className="animate-spin" size={18} /> : 'Send Message'}
+               </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
